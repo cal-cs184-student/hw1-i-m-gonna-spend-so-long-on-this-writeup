@@ -51,49 +51,134 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Using inspiration from the slides and the fact that rasterization is a sequential line by line rendering of a triangle, I looked at a nested for loop that would actively 
+		check whether every point that it was checking was inside of the triangle. I created a inside_triangle() function that used the any 3 points and returned true or false based on whether a point was 
+		inside the triangle. I created another helper function, inside_line() that took in 2 points to define a line, and an arbitrary point to test whether it was above the line or not. 
+		I created a line by taking the point furthest from the origin and subtracting it form the point cloest to the origin and taking it's norm by swapping the x and y components of the line vector and negating its y component.
+		I then defined the arbitray point by subracting the point closest to the origin from it to create a the arbitray line minus the given line. Taking the dot product of the arbitrary line and the norm of the given line, I returned the value as a float. 
+		Lastly I determined whether a given point was inside the triangle given by 3 points by checking if it was above all three lines created by the 3 points which was defined as a dot produt greater than 0. In my nested loop checking every single point, 
+		if it was indeed inside the triangle, then I would call rasterize_point to color in the point.
 
 		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="assets/lion.jpg" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="assets/lion.jpg" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="assets/lion.jpg" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="assets/lion.jpg" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="assets/test_4.png" width="400px"/>
+				  <figcaption>Test_4 svg after task 1</figcaption>
 				</td>
 			  </tr>
 			</table>
 		</div>
 		
 		<h2>Task 2: Antialiasing by Supersampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		For this task, I rendered the sample buffer using the dimensions that were provided by the width and height resizing and multiplied it by the sample rate, since the new buffer 
 
+        size was going to be width*sqrt(sample_rate) * height*sqrt(sample_rate). For me to change the drawpixel method I took inspiration from the hint and drew the entire 1*1*sample rate sample space and drew the entire thing in the exact color, which is the same as having no aliasing.
+
+        After that, I moved on to rasterize triangles, which used new bounds to prevent clipping that took the furthest points of the triangle or the bounds of the frame buffer, whichever one came first. After that I did the interpolating points within the triangle at increased rates of the width*height*sample rate.
+
+        I used increased for loops that covered the bounding box of the triangle as well as a double for loop to interpolate every pixel in the supersampled draw pixel method. For the resolve to framebuffer, I just counted the number of pixels that were colored in and took the average over the total number of pixels, which was just the sample rate, and used that number to choose the color.
+
+        which was then converted into the 3-tuple rbg values for the resolve rbg buffer target.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/screenshot_9-25_1-12-0.png" width="400px"/>
+				  <figcaption>Test_4 svg with no sampling</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="assets/screenshot_9-25_1-12-13.png" width="400px"/>
+					<figcaption>Test_4 svg with 4x sampling</figcaption>
+				  </td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/screenshot_9-25_1-12-6.png" width="400px"/>
+				  <figcaption>Test_4 svg with 9x sampling</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="assets/screenshot_9-25_1-12-9.png" width="400px"/>
+					<figcaption>Test_4 svg with 16x sampling</figcaption>
+				  </td>
+			  </tr>
+			</table>
+		</div>
 		<h2>Task 3: Transforms</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Over here I was trying to make the robot looking man dab while using a ton of rotation matrices, I used the standard translation, diagonal scaling matrix, and the 
+		rotations matrices that closley followed the givens rotation formula for rotatining about an axis, namely with x-y axis, since there is only one axis to rotate on.
+		Anyways, here is a dabbing robot that uses elementary transformation matrices. These can be composed to create more intricate transoformations.
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/screenshot_9-25_2-13-47.png" width="400px"/>
+				  <figcaption>Regular square man</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="assets/screenshot_9-25_2-14-5.png" width="400px"/>
+					<figcaption>Square man with transformations, woah</figcaption>
+				  </td>
+			  </tr>
+			</table>
+		</div>
 
 		<h2>Task 4: Barycentric coordinates</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+		Barycentric coordinates uses a triangle bound and identify points relational to the triangle through 3 wieghts, alpha, beta, and gamma. These weights are defined by a series of inside line fucntions that are products of dotproducts to determine if a given point 
+		is inside the lines determined by the triangle. The weights must sum up to 1, and if there is a negative wieght, that means that the given point sits outside the triangle. When a weight is set to 0, then the given point sits on the line associated with the weight, and if two weights are set to zero, 
+		 the point sits on two lines of the triangle, which means that it sits on a vertex. This is useful for interpolating colors, because the weights can be used to signifiy intesities of an RGB triangle with each vertex being a 100 percent strength R, G, or B. With a given point being inside the triangle means 
+		 the weights from [0, 1] give a precentage of a color. This sums up to an RBG with each value weighed by the alpha, beta, gamma , weights. 
+		 This formula was implemented from the Foundations of Computer Graphics, by Peter Shirley textbook.
+		 <div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/Barycentric_RGB.svg.png" width="400px"/>
+				  <figcaption>Here is an example of a triangle with rgb vertices and barycentric interpolation</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="assets/screenshot_9-28_2-50-40.png" width="400px"/>
+					<figcaption>Here is a test svg using barycentric color interpolation</figcaption>
+				  </td>
+			  </tr>
+			</table>
+		</div>
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+		Pixel sampling is a way of evaluating a pixel to get a measure from it. In the most simple case such as rastertization, pixel sampling means testing points within screen space and determining if the points
+		fall inside the boundaries of the triangle that is meant to be drawn onto the screen. In other cases point sampling the defines evaluating points as a measure of color interpolation, however in this task, point sampling
+		was used to interpolate texture at given points. Nearest neighbor sampling is a good 2d example that teachers texture mapping via pixel sampling because it simply determines the color of a texture mapping by converting 
+		coordinates of a point from screenspace to texture space via scaling of the image dimensions. My implementation for nearest neighbors simply had me convert between my argument vectors components by the dimensinos of the texel space to map out the 
+		colors from returned for the screen space. I also had to to some standard comparisons to make sure that there was no clipping within the frame buffer and make sure that the dimensions from the texture space were valid for sampling. Bilinear sampling works differently, it uses the texture values form the neighboring texel pixels.
+		It scales the values from the nearby 4 texels and using another calculation that uses u and v prime terms which are subtrations of their scaled versions minus the floored version of their scaled versions. After that, the sums of the four texel colors were added together providing a 
+		smoother although computationally more hevy render. 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/screenshot_9-28_3-24-21.png" width="400px"/>
+				  <figcaption>An example of a texmap with binlinear sampling, smoother lines</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="assets/screenshot_9-28_3-24-25.png" width="400px"/>
+					<figcaption>An example of a texmap with nearest neightbor sampline, jagged lines</figcaption>
+				  </td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/screenshot_9-28_3-24-28.png" width="400px"/>
+				  <figcaption>Bilinear sampling for texmap without pixel selector/figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="assets/screenshot_9-28_3-24-32.png" width="400px"/>
+					<figcaption>Nearestneighbor texmap without pixel selector</figcaption>
+				  </td>
+			  </tr>
+			</table>
+		</div>
 		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+		
 		<h2>(Optional) Task 7: Extra Credit - Draw Something Creative!</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
